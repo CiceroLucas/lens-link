@@ -31,14 +31,14 @@ const Feed: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <div className="flex flex-col justify-between md:flex-row max-w-6xl mx-auto p-4 gap-4">
-        <aside>
+      <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 gap-4">
+        <aside className="w-full md:w-1/4">
           <ProfileBox />
         </aside>
-        <main className="flex-1">
+        <main className="flex-1 md:w-1/3">
           <Posts />
         </main>
-        <div>
+        <div className="hidden md:block md:w-1/4">
           <SearchBox />
         </div>
       </div>
