@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Repository } from "../types/post";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { fetchPosts } from "../api/serverApi";
+import { fetchPosts } from "../api/service/serviceApi";
 
 export default function Posts() {
   const [posts, setPosts] = useState<Repository[]>([]);

@@ -1,4 +1,4 @@
-import { Repository } from "../types/post";
+import { Repository } from "../../types/post";
 
 export async function fetchPosts(accessToken: string): Promise<Repository[]> {
   if (!accessToken) {
