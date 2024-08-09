@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { Repository } from "../types/post";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { fetchPosts } from "../api/service/serviceApi";
+import { fetchPosts, likePost } from "../api/service/serviceApi"; // Importe a função likePost
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
 
 export default function Posts() {
   const [posts, setPosts] = useState<Repository[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set()); // Estado para gerenciar posts curtidos
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -31,6 +35,32 @@ export default function Posts() {
 
     getPosts();
   }, [session]);
+
+  const toggleLike = async (postId: string) => {
+    try {
+      if (likedPosts.has(postId)) {
+        // Caso já esteja curtido, remova do conjunto
+        setLikedPosts((prevLikedPosts) => {
+          const newLikedPosts = new Set(prevLikedPosts);
+          newLikedPosts.delete(postId);
+          return newLikedPosts;
+        });
+      } else {
+        // Caso não esteja curtido, adicione ao conjunto
+        setLikedPosts((prevLikedPosts) => {
+          const newLikedPosts = new Set(prevLikedPosts);
+          newLikedPosts.add(postId);
+          return newLikedPosts;
+        });
+      }
+
+      if (session?.user?.access_token) {
+        await likePost(session.user.access_token, postId);
+      }
+    } catch (error) {
+      console.error("Failed to like post:", error);
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-4">Loading...</div>;
@@ -56,7 +86,7 @@ export default function Posts() {
                 height={40}
                 width={40}
                 alt={`${post.user.firstName}'s profile picture`}
-                className="rounded-full"
+                className="rounded-full object-cover"
                 unoptimized
               />
               <div className="ml-4">
@@ -66,17 +96,29 @@ export default function Posts() {
               </div>
             </div>
 
-            <Image
-              src={post.image}
-              height={400}
-              width={400}
-              alt={post.description}
-              className="w-full h-auto object-cover rounded-t-lg"
-              unoptimized
-            />
+            <div className="relative w-full" style={{ height: 400 }}>
+              <div className="absolute inset-0 p-2">
+                <Image
+                  src={post.image}
+                  layout="fill"
+                  objectFit="cover"
+                  alt={post.description}
+                  className="rounded-t-lg"
+                  unoptimized
+                />
+              </div>
+            </div>
+
+            <div className="p-4 flex items-center justify-between">
+              <p className="text-gray-600 mb-2">Likes: {post.likes}</p>
+              <FontAwesomeIcon
+                icon={likedPosts.has(post.id) ? faHeartSolid : faHeartRegular}
+                className="text-red-500 cursor-pointer"
+                onClick={() => toggleLike(post.id)}
+              />
+            </div>
 
             <div className="p-4">
-              <p className="text-gray-600 mb-2">Likes: {post.likes}</p>
               <h5 className="text-xl font-bold">{post.description}</h5>
             </div>
           </div>
