@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Repository } from "../types/post";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { fetchPosts } from "../api/serverApi";
 
 export default function Posts() {
   const [posts, setPosts] = useState<Repository[]>([]);
@@ -15,21 +16,7 @@ export default function Posts() {
       }
 
       try {
-        const response = await fetch(
-          `https://lens-link-api.onrender.com/api/v1/post`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${session?.user.access_token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-
-        const res = await response.json();
+        const res = await fetchPosts(session.user.access_token);
         setPosts(res);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
