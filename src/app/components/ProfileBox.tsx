@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
+import { ImProfile } from "react-icons/im";
 import Image from "next/image";
-import { Repository } from "../types/post";
 import { useSession } from "next-auth/react";
+import Modal from "./Modal";
+import { Repository } from "../types/post";
 
 const ProfileBox: React.FC = () => {
   const [posts, setPosts] = useState<Repository[]>([]);
   const { data: session } = useSession();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     async function getPosts() {
@@ -40,6 +43,9 @@ const ProfileBox: React.FC = () => {
     getPosts();
   }, [session]);
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-md">
       <div className="flex flex-col items-center">
@@ -63,16 +69,19 @@ const ProfileBox: React.FC = () => {
             className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
             aria-label="Voltar para página inicial"
           >
-            <FaArrowLeft />
+            <ImProfile />
           </button>
           <button
             className="p-2 rounded-full bg-green-500 hover:bg-green-600 text-white"
             aria-label="Criar publicação"
+            onClick={openModal}
           >
             <FaPlus />
           </button>
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={closeModal} />
     </div>
   );
 };

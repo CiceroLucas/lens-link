@@ -80,7 +80,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ accessToken }) => {
           results.map((user) => (
             <li
               key={user.id}
-              className="py-2 border-b border-gray-200 flex items-center"
+              className="p-2 border-b border-gray-200 flex items-center cursor-pointer hover:bg-gray-100"
             >
               {user.profilePic && (
                 <img
