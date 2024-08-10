@@ -12,6 +12,7 @@ export default function Posts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set()); // Estado para gerenciar posts curtidos
+  const [likesCount, setLikesCount] = useState<{ [key: string]: number }>({}); // Estado para gerenciar o número de likes
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -25,6 +26,11 @@ export default function Posts() {
       try {
         const res = await fetchPosts(session.user.access_token);
         setPosts(res);
+        const initialLikesCount = res.reduce((acc, post) => {
+          acc[post.id] = post.likes;
+          return acc;
+        }, {} as { [key: string]: number });
+        setLikesCount(initialLikesCount);
       } catch (error) {
         setError("Failed to fetch posts.");
         console.error("Failed to fetch posts:", error);
@@ -38,22 +44,33 @@ export default function Posts() {
 
   const toggleLike = async (postId: string) => {
     try {
+      let newLikesCount = likesCount[postId];
+
       if (likedPosts.has(postId)) {
-        // Caso já esteja curtido, remova do conjunto
+        // Caso já esteja curtido, remova do conjunto e diminua o número de likes
         setLikedPosts((prevLikedPosts) => {
           const newLikedPosts = new Set(prevLikedPosts);
           newLikedPosts.delete(postId);
           return newLikedPosts;
         });
+        newLikesCount -= 1;
       } else {
-        // Caso não esteja curtido, adicione ao conjunto
+        // Caso não esteja curtido, adicione ao conjunto e aumente o número de likes
         setLikedPosts((prevLikedPosts) => {
           const newLikedPosts = new Set(prevLikedPosts);
           newLikedPosts.add(postId);
           return newLikedPosts;
         });
+        newLikesCount += 1;
       }
 
+      // Atualize o número de likes instantaneamente
+      setLikesCount((prevLikesCount) => ({
+        ...prevLikesCount,
+        [postId]: newLikesCount,
+      }));
+
+      // Faça a requisição para o backend
       if (session?.user?.access_token) {
         await likePost(session.user.access_token, postId);
       }
@@ -110,12 +127,14 @@ export default function Posts() {
             </div>
 
             <div className="p-4 flex items-center justify-between">
-              <p className="text-gray-600 mb-2">Likes: {post.likes}</p>
-              <FontAwesomeIcon
-                icon={likedPosts.has(post.id) ? faHeartSolid : faHeartRegular}
-                className="text-red-500 cursor-pointer"
-                onClick={() => toggleLike(post.id)}
-              />
+              <p className="text-gray-600 mb-2">
+                <FontAwesomeIcon
+                  icon={likedPosts.has(post.id) ? faHeartSolid : faHeartRegular}
+                  className="text-red-500 cursor-pointer"
+                  onClick={() => toggleLike(post.id)}
+                />
+                <span> Likes: {likesCount[post.id]}</span>
+              </p>
             </div>
 
             <div className="p-4">
