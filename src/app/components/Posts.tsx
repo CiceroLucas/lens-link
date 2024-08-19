@@ -31,7 +31,7 @@ export default function Posts() {
       {posts.map((post) => (
         <div
           key={post.id}
-          className="max-w-sm mt-8 bg-white border border-gray-200 rounded-lg shadow"
+          className="w-[390px] h-[425px] mb-8 bg-white border border-gray-200 rounded-lg shadow"
         >
           <div className="flex items-center">
             <Image
@@ -48,15 +48,16 @@ export default function Posts() {
               </p>
             </div>
           </div>
-
-          <Image
-            src={post.image}
-            height={400}
-            width={400}
-            alt={post.description}
-            className="p-2 mx-auto mt-4 rounded-xl"
-            unoptimized
-          />
+          <div>
+            <Image
+              src={post.image}
+              height={0}
+              width={0}
+              alt={post.description}
+              className="p-2 mx-auto rounded-xl w-full h-72 object-cover"
+              unoptimized
+            />
+          </div>
 
           <div className="ml-2">
             <p>likes: {post.likes}</p>
