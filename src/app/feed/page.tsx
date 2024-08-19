@@ -14,18 +14,18 @@ const Feed: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return; // Aguarde até que a autenticação seja carregada
+    if (status === "loading") return;
     if (!session) {
-      router.push("/"); // Redireciona para a página inicial se não estiver autenticado
+      router.push("/");
     }
   }, [session, status, router]);
 
   if (status === "loading") {
-    return <Loading />; // Exibe um componente de carregamento enquanto o status está sendo verificado
+    return <Loading />;
   }
 
   if (!session) {
-    return null; // Caso não esteja autenticado, nada é renderizado
+    return null;
   }
 
   return (
@@ -40,7 +40,6 @@ const Feed: React.FC = () => {
         </main>
         <div className="hidden md:block md:w-1/4">
           <SearchBox accessToken={session?.user.access_token || ""} />
-          {/* Garante que accessToken é uma string, fornecendo uma string vazia como fallback */}
         </div>
       </div>
     </div>
