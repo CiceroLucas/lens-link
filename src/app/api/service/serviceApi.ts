@@ -63,6 +63,37 @@ export async function searchUsers(
   }
 }
 
+export async function fetchPostsByUserId(
+  userId: string,
+  accessToken: string
+): Promise<Repository[]> {
+  if (!accessToken) {
+    throw new Error("No access token provided");
+  }
+
+  try {
+    const response = await fetch(
+      `https://lens-link-api.onrender.com/api/v1/users/${userId}/posts`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const data: Repository[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch posts:", error);
+    throw error;
+  }
+}
+
 // Função para curtir um post
 export async function likePost(
   accessToken: string,

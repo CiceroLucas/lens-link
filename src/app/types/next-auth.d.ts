@@ -15,4 +15,12 @@ declare module "next-auth" {
   interface User {
     access_token: string;
   }
+
+  interface MyJwtPayload extends JwtPayload {
+    firstName: string;
+    lastName: string;
+    profilePic: string | StaticImport;
+    email: string;
+    sub: string | null | undefined;
+  }
 }

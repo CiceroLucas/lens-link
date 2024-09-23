@@ -7,16 +7,17 @@ import Image from "next/image";
 export default function Posts() {
   const [posts, setPosts] = useState<Repository[]>([]);
   const { data: session } = useSession();
+  const token = session?.user?.access_token;
 
   useEffect(() => {
     async function getPosts() {
-      if (!session?.user?.access_token) {
+      if (!token) {
         console.error("No access token available");
         return;
       }
 
       try {
-        const res = await fetchPosts(session.user.access_token);
+        const res = await fetchPosts(token);
         setPosts(res);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
@@ -24,7 +25,7 @@ export default function Posts() {
     }
 
     getPosts();
-  }, [session]);
+  }, [session, token]);
 
   return (
     <div className="flex flex-col justify-center items-center">

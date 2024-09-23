@@ -9,7 +9,7 @@ import Posts from "../components/Posts";
 import ProfileBox from "../components/ProfileBox";
 import SearchBox from "../components/SearchBox";
 
-const Feed: React.FC = () => {
+export default function Feed() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -44,6 +44,4 @@ const Feed: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Feed;
+}

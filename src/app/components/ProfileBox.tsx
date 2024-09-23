@@ -1,47 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { FaArrowLeft, FaPlus } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaPlus } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import Modal from "./Modal";
-import { Repository } from "../types/post";
+
+import { jwtDecode } from "jwt-decode";
+import { MyJwtPayload } from "next-auth";
 
 const ProfileBox: React.FC = () => {
-  const [posts, setPosts] = useState<Repository[]>([]);
   const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
-    async function getPosts() {
-      if (!session?.user?.access_token) {
-        console.error("No access token available");
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `https://lens-link-api.onrender.com/api/v1/post`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${session?.user.access_token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-
-        const res = await response.json();
-        setPosts(res);
-      } catch (error) {
-        console.error("Failed to fetch posts:", error);
-      }
-    }
-
-    getPosts();
-  }, [session]);
+  const decodedToken = session?.user?.access_token
+    ? jwtDecode<MyJwtPayload>(session.user.access_token)
+    : null;
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -50,7 +23,7 @@ const ProfileBox: React.FC = () => {
     <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-md">
       <div className="flex flex-col items-center">
         <Image
-          src={session?.user?.profilePic || "/default-profile.png"}
+          src={decodedToken?.profilePic}
           priority
           unoptimized
           width={100}
@@ -60,7 +33,7 @@ const ProfileBox: React.FC = () => {
         />
         <div className="mt-4 text-center">
           <strong className="block text-lg font-semibold">
-            {session?.user?.firstName} {session?.user?.lastName}
+            {decodedToken?.firstName} {decodedToken?.lastName}
           </strong>
           <p className="text-gray-600">{session?.user?.email}</p>
         </div>
