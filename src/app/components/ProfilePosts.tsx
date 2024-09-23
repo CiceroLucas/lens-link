@@ -9,7 +9,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 
-const UserPosts = () => {
+export default function UserPosts() {
   const [posts, setPosts] = useState<Repository[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,6 +91,4 @@ const UserPosts = () => {
       </div>
     </div>
   );
-};
-
-export default UserPosts;
+}

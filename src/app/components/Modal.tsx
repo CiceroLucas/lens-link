@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React, { useState, useEffect } from "react";
 
 interface ModalProps {
@@ -60,7 +61,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         {/* Exibe a mensagem de erro */}
         {preview && (
           <div className="relative mt-4">
-            <img
+            <Image
               src={preview}
               alt="Imagem Selecionada"
               className="max-w-full max-h-72 rounded-md object-cover"

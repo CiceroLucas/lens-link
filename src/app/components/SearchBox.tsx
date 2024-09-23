@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { FaSearch } from "react-icons/fa";
 import { searchUsers } from "../api/service/serviceApi"; // Ajuste o caminho conforme necessário
 import debounce from "lodash/debounce"; // Importa a função debounce
+import Image from "next/image";
 
 interface SearchBoxProps {
   accessToken: string;
@@ -83,10 +84,13 @@ const SearchBox: React.FC<SearchBoxProps> = ({ accessToken }) => {
               className="p-2 border-b border-gray-200 flex items-center cursor-pointer hover:bg-gray-100"
             >
               {user.profilePic && (
-                <img
+                <Image
                   src={user.profilePic}
                   alt={`${user.firstName} ${user.lastName}`}
                   className="w-8 h-8 rounded-full mr-2"
+                  width={0}
+                  height={0}
+                  unoptimized
                 />
               )}
               <span>
