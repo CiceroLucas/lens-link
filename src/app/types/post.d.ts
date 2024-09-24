@@ -1,5 +1,5 @@
 export type Repository = {
-  id: string;
+  id: number;
   image: string;
   description: string;
   likes: number;
@@ -11,4 +11,5 @@ export type Repository = {
     userId: string;
   };
   comments: [];
+  isLiked: boolean;
 };

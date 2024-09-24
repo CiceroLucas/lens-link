@@ -1,5 +1,7 @@
 import { Repository } from "../../types/post";
 
+const BACKEND_URL = "https://lens-link-api.onrender.com/api";
+
 // Função para buscar posts
 export async function fetchPosts(accessToken: string): Promise<Repository[]> {
   if (!accessToken) {
@@ -7,15 +9,12 @@ export async function fetchPosts(accessToken: string): Promise<Repository[]> {
   }
 
   try {
-    const response = await fetch(
-      `https://lens-link-api.onrender.com/api/v1/post`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/v1/post`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
@@ -40,9 +39,7 @@ export async function searchUsers(
 
   try {
     const response = await fetch(
-      `https://lens-link-api.onrender.com/api/v1/users/search?name=${encodeURIComponent(
-        query
-      )}`,
+      `${BACKEND_URL}/v1/users/search?name=${encodeURIComponent(query)}`,
       {
         method: "GET",
         headers: {
@@ -72,15 +69,12 @@ export async function fetchPostsByUserId(
   }
 
   try {
-    const response = await fetch(
-      `https://lens-link-api.onrender.com/api/v1/users/${userId}/posts`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await fetch(`${BACKEND_URL}/v1/users/${userId}/posts`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
@@ -95,31 +89,34 @@ export async function fetchPostsByUserId(
 }
 
 // Função para curtir um post
-export async function likePost(
-  accessToken: string,
-  postId: string
-): Promise<void> {
-  if (!accessToken) {
-    throw new Error("No access token provided");
+export const likePost = async (postId: number, token: string) => {
+  const response = await fetch(`${BACKEND_URL}/v1/post/${postId}/like`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to like post");
   }
 
-  try {
-    const response = await fetch(
-      `https://lens-link-api.onrender.com/api/v1/post/${postId}/like`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  return await response.json();
+};
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.statusText}`);
-    }
-  } catch (error) {
-    console.error("Failed to like post:", error);
-    throw error;
+export const unlikePost = async (postId: number, token: string) => {
+  const response = await fetch(`${BACKEND_URL}/v1/post/${postId}/like`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to unlike post");
   }
-}
+
+  return await response.json();
+};
