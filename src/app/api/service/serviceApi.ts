@@ -120,3 +120,27 @@ export const unlikePost = async (postId: number, token: string) => {
 
   return await response.json();
 };
+
+export async function uploadPost(
+  file: File,
+  description: string,
+  token: string
+): Promise<any> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("description", description);
+
+  const response = await fetch(`${BACKEND_URL}/v1/post`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to upload post image");
+  }
+
+  return await response.json();
+}

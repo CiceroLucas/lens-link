@@ -11,6 +11,7 @@ import { MyJwtPayload } from "next-auth";
 const ProfileBox: React.FC = () => {
   const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const token = session?.user.access_token || "";
 
   const decodedToken = session?.user?.access_token
     ? jwtDecode<MyJwtPayload>(session.user.access_token)
@@ -54,7 +55,7 @@ const ProfileBox: React.FC = () => {
         </div>
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={closeModal} />
+      <Modal isOpen={isModalOpen} onClose={closeModal} accessToken={token} />
     </div>
   );
 };

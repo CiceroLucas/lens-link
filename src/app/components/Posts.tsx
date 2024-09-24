@@ -20,7 +20,14 @@ export default function Posts() {
 
       try {
         const res = await fetchPosts(token);
-        setPosts(res);
+
+        // Ordenar os posts por data de criação (do mais recente para o mais antigo)
+        const sortedPosts = res.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setPosts(sortedPosts);
       } catch (error) {
         console.error("Failed to fetch posts:", error);
       }

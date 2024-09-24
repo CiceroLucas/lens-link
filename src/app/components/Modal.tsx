@@ -1,14 +1,17 @@
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
+import { uploadPost } from "../api/service/serviceApi";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  accessToken: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+export default function Modal({ isOpen, onClose, accessToken }: ModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,11 +27,19 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      console.log("Uploading:", selectedFile);
-      // Adicione aqui a lógica para fazer o upload da imagem
-      onClose(); // Fecha o modal após o upload
+  const handleUpload = async () => {
+    if (selectedFile && description) {
+      try {
+        await uploadPost(selectedFile, description, accessToken);
+        onClose();
+      } catch (error) {
+        setErrorMessage("Falha no upload da imagem.");
+        console.error(error);
+      }
+    } else {
+      setErrorMessage(
+        "Por favor, selecione uma imagem e insira uma descrição."
+      );
     }
   };
 
@@ -49,48 +60,71 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg z-60 w-96 max-w-lg">
-        {" "}
-        {/* Aumentei o tamanho do modal */}
-        <h2 className="text-lg font-bold mb-4">Upload de Imagem</h2>
-        <input type="file" accept="image/*" onChange={handleFileChange} />{" "}
-        {/* Somente imagens podem ser selecionadas */}
-        {errorMessage && (
-          <p className="text-red-500 mt-2">{errorMessage}</p>
-        )}{" "}
-        {/* Exibe a mensagem de erro */}
-        {preview && (
-          <div className="relative mt-4">
-            <Image
-              src={preview}
-              alt="Imagem Selecionada"
-              className="max-w-full max-h-72 rounded-md object-cover"
-            />
-            <button
-              className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 text-white px-2 py-1 rounded-full hover:bg-red-600"
-              onClick={closePreview}
-            >
-              X
-            </button>
-          </div>
-        )}
-        <div className="mt-4 flex justify-end">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl">
+        <div className="flex justify-between p-2">
           <button
-            className="mr-2 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            className="mr-4 px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
             onClick={onClose}
           >
             Cancelar
           </button>
+
+          <h2 className="text-2xl text-center font-semibold mb-6 ">
+            Criar nova publicação
+          </h2>
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
             onClick={handleUpload}
           >
-            Upload
+            Compartilhar
           </button>
+        </div>
+
+        <div className="flex gap-8 p-2 bg-[#1C2833]">
+          <div className="flex-shrink-0">
+            {preview ? (
+              <div className="relative ">
+                <Image
+                  src={preview}
+                  width={300}
+                  height={350}
+                  alt="Imagem Selecionada"
+                  className="rounded-lg object-cover"
+                />
+                <button
+                  className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition"
+                  onClick={closePreview}
+                >
+                  X
+                </button>
+              </div>
+            ) : (
+              <div className="w-64 h-64 border-2 border-dashed border-gray-300 flex items-center justify-center rounded-lg">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="cursor-pointer absolute opacity-0 w-64 h-64"
+                />
+                <p className="text-gray-400">Selecione uma imagem</p>
+              </div>
+            )}
+          </div>
+
+          <div className="flex-grow ">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Digite a descrição da imagem..."
+              className="w-full bg-[#1C2833] text-white h-64 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            {errorMessage && (
+              <p className="text-red-500 mt-2">{errorMessage}</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Modal;
+}
