@@ -36,7 +36,7 @@ export default function Login() {
           <div className="md:max-w-md w-full sm:px-6 py-4">
             <form onSubmit={handleSubmit}>
               <div className="mb-12">
-                <h3 className="text-3xl font-extrabold">Sign in</h3>
+                <h3 className="text-3xl font-extrabold">Login</h3>
                 <p className="text-sm mt-4 ">
                   Não possui uma conta?{" "}
                   <a
@@ -89,13 +89,13 @@ export default function Login() {
                   type="submit"
                   className="button w-full shadow-xl py-2.5 px-4 text-sm font-semibold rounded-full text-white hover:bg-blue-700 focus:outline-none"
                 >
-                  Sign in
+                  Entrar
                 </button>
               </div>
             </form>
           </div>
 
-          <div className="md:h-full text-white max-md:mt-10 bg-[#264ECA] rounded-xl lg:p-12 p-8">
+          <div className="md:h-full text-white max-md:mt-10 bg-[#0099FF] rounded-xl lg:p-12 p-8">
             <h1 className="text-4xl">
               Bem vindo ao
               <br /> lens link.

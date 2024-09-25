@@ -25,6 +25,7 @@ export default function UserPosts() {
         if (!userId) throw new Error("User ID not available");
         const fetchedPosts = await fetchPostsByUserId(userId, token);
 
+        // Ordenar os posts pela data de criação mais recente
         const sortedPosts = fetchedPosts.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -46,6 +47,9 @@ export default function UserPosts() {
   if (loading) return <p className="text-center">Loading posts...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  // Contador de publicações
+  const postCount = posts.length;
+
   return (
     <div className="bg-white rounded-md shadow mt-10 ml-10 mr-10">
       <div className="py-2 text-center mt-5">
@@ -54,6 +58,12 @@ export default function UserPosts() {
           icon={faImage}
         />
       </div>
+
+      {/* Exibir o contador de postagens */}
+      <h2 className="text-center text-xl font-bold mb-4">
+        Publicações: {postCount}
+      </h2>
+
       <div className="md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
         {posts.length > 0 ? (
           posts.map((post) => (
@@ -78,13 +88,11 @@ export default function UserPosts() {
                   style={{ height: "300px", width: "410px" }}
                 />
                 <Link
-                  className="flex justify-center items-center bg-blue-500 bg-opacity-80 absolute top-0 left-0 w-full h-full text-white rounded-2xl opacity-0 transition-all duration-300 transform group-hover:scale-105 text-xl group-hover:opacity-100"
+                  className="flex justify-center items-center bg-opacity-80 absolute top-0 left-0 w-full h-full text-white rounded-2xl opacity-0 transition-all duration-300 transform group-hover:scale-105 text-xl group-hover:opacity-100"
                   href={post.image}
                   target="_blank"
                   rel="noopener noreferrer"
-                >
-                  Ver imagen
-                </Link>
+                ></Link>
               </div>
               <h3 className="font-medium text-xl leading-8 text-center">
                 <span dangerouslySetInnerHTML={{ __html: post.description }} />
