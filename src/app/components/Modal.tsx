@@ -80,7 +80,7 @@ export default function Modal({ isOpen, onClose, accessToken }: ModalProps) {
           </button>
         </div>
 
-        <div className="flex gap-8 p-2 bg-[#1C2833]">
+        <div className="flex gap-8 p-2">
           <div className="flex-shrink-0">
             {preview ? (
               <div className="relative ">
@@ -116,7 +116,7 @@ export default function Modal({ isOpen, onClose, accessToken }: ModalProps) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Digite a descrição da imagem..."
-              className="w-full bg-[#1C2833] text-white h-64 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-64 p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             {errorMessage && (
