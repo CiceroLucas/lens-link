@@ -24,7 +24,13 @@ export default function UserPosts() {
       try {
         if (!userId) throw new Error("User ID not available");
         const fetchedPosts = await fetchPostsByUserId(userId, token);
-        setPosts(fetchedPosts);
+
+        const sortedPosts = fetchedPosts.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        setPosts(sortedPosts);
       } catch (err: any) {
         setError(err.message);
       } finally {

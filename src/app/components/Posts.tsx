@@ -1,15 +1,26 @@
 import { useEffect, useState } from "react";
 import { Repository } from "../types/post";
 import { useSession } from "next-auth/react";
-import { fetchPosts, likePost, unlikePost } from "../api/service/serviceApi";
+import {
+  deletePost,
+  fetchPosts,
+  likePost,
+  unlikePost,
+} from "../api/service/serviceApi";
 import Image from "next/image";
 import { AiFillHeart } from "react-icons/ai";
 import { FiHeart } from "react-icons/fi";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { jwtDecode } from "jwt-decode";
+import { MyJwtPayload } from "next-auth";
 
 export default function Posts() {
   const [posts, setPosts] = useState<Repository[]>([]);
   const { data: session } = useSession();
-  const token = session?.user?.access_token;
+  const token = session?.user?.access_token || "";
+  const decodedToken = token ? jwtDecode<MyJwtPayload>(token) : null;
+  const userId = decodedToken?.sub;
 
   useEffect(() => {
     async function getPosts() {
@@ -21,7 +32,6 @@ export default function Posts() {
       try {
         const res = await fetchPosts(token);
 
-        // Ordenar os posts por data de criação (do mais recente para o mais antigo)
         const sortedPosts = res.sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -61,6 +71,15 @@ export default function Posts() {
     }
   };
 
+  const handleDelete = async (postId: number) => {
+    try {
+      await deletePost(postId, token);
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center">
       {posts.map((post) => (
@@ -82,6 +101,14 @@ export default function Posts() {
                 {post.user.firstName} {post.user.lastName}
               </p>
             </div>
+            {post.user.userId === userId && (
+              <button
+                className="text-red-500 mt-4 ml-auto mr-4"
+                onClick={() => handleDelete(post.id)}
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            )}
           </div>
           <div>
             <Image

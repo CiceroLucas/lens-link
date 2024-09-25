@@ -144,3 +144,16 @@ export async function uploadPost(
 
   return await response.json();
 }
+
+export async function deletePost(postId: number, token: string) {
+  const response = await fetch(`${BACKEND_URL}/v1/post/${postId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete post");
+  }
+}
