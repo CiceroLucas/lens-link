@@ -1,13 +1,20 @@
+import React, { useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { jwtDecode } from "jwt-decode";
 import { MyJwtPayload } from "next-auth";
+import ProfileModal from "./ProfileModal";
 
 export default function ProfileHeader() {
   const { data: session } = useSession();
   const decodedToken = session?.user?.access_token
     ? jwtDecode<MyJwtPayload>(session.user.access_token)
     : null;
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <section className="relative bg-white rounded-md shadow ml-10 mr-10">
@@ -46,12 +53,21 @@ export default function ProfileHeader() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <button className="py-3.5 px-5 rounded-full bg-indigo-500 text-white font-semibold text-base leading-7 shadow-sm shadow-transparent transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700">
+            <button
+              onClick={openModal}
+              className="py-3.5 px-5 rounded-full bg-indigo-500 text-white font-semibold text-base leading-7 shadow-sm shadow-transparent transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700"
+            >
               Editar Perfil
             </button>
           </div>
         </div>
       </div>
+
+      <ProfileModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        userProfile={decodedToken}
+      />
     </section>
   );
 }

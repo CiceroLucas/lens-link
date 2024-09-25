@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { ImProfile } from "react-icons/im";
 import Image from "next/image";
+import Link from "next/link";
 import { useSession } from "next-auth/react";
-import Modal from "./Modal";
+import Modal from "./PubModal";
 
 import { jwtDecode } from "jwt-decode";
 import { MyJwtPayload } from "next-auth";
@@ -39,12 +40,14 @@ const ProfileBox: React.FC = () => {
           <p className="text-gray-600">{session?.user?.email}</p>
         </div>
         <div className="flex space-x-4 mt-4">
-          <button
-            className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
-            aria-label="Voltar para página inicial"
-          >
-            <ImProfile />
-          </button>
+          <Link href="/profile">
+            <button
+              className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 text-white"
+              aria-label="Voltar para página inicial"
+            >
+              <ImProfile />
+            </button>
+          </Link>
           <button
             className="p-2 rounded-full bg-green-500 hover:bg-green-600 text-white"
             aria-label="Criar publicação"

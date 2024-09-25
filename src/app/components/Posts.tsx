@@ -85,7 +85,7 @@ export default function Posts() {
       {posts.map((post) => (
         <div
           key={post.id}
-          className="w-[390px] h-[445px] mb-8 bg-white border border-gray-200 rounded-lg shadow"
+          className="w-[400px] h-[460px] mb-8 bg-white border border-gray-200 rounded-lg shadow"
         >
           <div className="flex items-center">
             <Image
