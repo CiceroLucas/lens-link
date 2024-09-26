@@ -1,29 +1,36 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { MyJwtPayload } from "next-auth"; // Importar a interface que você definiu
+import { editUserProfile } from "../api/service/serviceApi";
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userProfile: MyJwtPayload | null;
+  accessToken: string;
+  userId: string;
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({
+export default function ProfileModal({
   isOpen,
   onClose,
-  userProfile,
-}) => {
-  const [firstName, setFirstName] = useState(userProfile?.firstName || "");
-  const [lastName, setLastName] = useState(userProfile?.lastName || "");
-  const [email, setEmail] = useState(userProfile?.email || "");
-  const [profilePic, setProfilePic] = useState(userProfile?.profilePic || "");
+  accessToken,
+  userId,
+}: ProfileModalProps) {
+  const [firstName, setFirstName] = useState<string>(""); // Inicializando com string vazia
+  const [lastName, setLastName] = useState<string>(""); // Inicializando com string vazia
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     // Lógica para salvar as informações editadas
-    console.log({ firstName, lastName, email, profilePic });
-    onClose(); // Fechar modal após salvar
+    try {
+      await editUserProfile(userId, accessToken, firstName, lastName);
+
+      onClose(); // Fechar modal após salvar
+    } catch (error) {
+      console.error("Erro ao atualizar perfil:", error);
+    }
   };
 
   return (
@@ -55,28 +62,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               onChange={(e) => setLastName(e.target.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <input
-              type="email"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Foto de Perfil (URL)
-            </label>
-            <input
-              type="text"
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-              value={profilePic}
-              onChange={(e) => setProfilePic(e.target.value)}
-            />
-          </div>
+
           <div className="flex justify-end space-x-4 mt-4">
             <button
               type="button"
@@ -96,6 +82,4 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       </div>
     </div>
   );
-};
-
-export default ProfileModal;
+}

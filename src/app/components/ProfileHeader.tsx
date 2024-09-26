@@ -1,20 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
-import { jwtDecode } from "jwt-decode";
-import { MyJwtPayload } from "next-auth";
-import ProfileModal from "./ProfileModal";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { jwtDecode } from "jwt-decode"; // Corrigi a importação
+import { MyJwtPayload } from "next-auth"; // Certifique-se de que este tipo está definido corretamente
+import { uploadProfilePicture } from "../api/service/serviceApi";
 
 export default function ProfileHeader() {
-  const { data: session } = useSession();
+  const { data: session, update } = useSession();
   const decodedToken = session?.user?.access_token
     ? jwtDecode<MyJwtPayload>(session.user.access_token)
     : null;
 
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const userId = decodedToken?.sub;
+  const [profilePic, setProfilePic] = useState(decodedToken?.profilePic);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const newProfilePicUrl = await uploadProfilePicture(
+        userId,
+        file,
+        session?.user.access_token
+      );
+      setProfilePic(newProfilePicUrl);
+
+      // Opcional: Atualizar a sessão se necessário
+      // await update(); // Dependendo de como a sessão é gerenciada
+    } catch (error) {
+      console.error("Erro ao atualizar a foto de perfil:", error);
+      alert("Falha ao atualizar a foto de perfil. Tente novamente.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <section className="relative bg-white rounded-md shadow ml-10 mr-10">
@@ -32,15 +62,29 @@ export default function ProfileHeader() {
 
       {/* Conteúdo do header */}
       <div className="w-full max-w-7xl mx-auto px-6 md:px-8 mt-[-75px] mb-10 relative z-10">
-        <div className="flex items-center justify-center sm:justify-start mb-5">
+        <div className="flex items-center justify-center sm:justify-start mb-5 relative">
           <Image
-            src={decodedToken?.profilePic}
+            src={profilePic} // Imagem padrão se profilePic não existir
             alt="user-avatar-image"
             className="border-4 border-solid border-white rounded-full object-cover"
             width={150}
             height={150}
             priority
             unoptimized
+          />
+          <button
+            onClick={triggerFileInput}
+            className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 shadow-lg"
+            title="Atualizar foto de perfil"
+          >
+            📷
+          </button>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
           />
         </div>
         <div className="flex flex-col sm:flex-row max-sm:gap-5 items-center justify-between mb-5">
@@ -52,22 +96,9 @@ export default function ProfileHeader() {
               {decodedToken?.email}
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={openModal}
-              className="py-3.5 px-5 rounded-full bg-indigo-500 text-white font-semibold text-base leading-7 shadow-sm shadow-transparent transition-all duration-500 hover:shadow-gray-100 hover:bg-indigo-700"
-            >
-              Editar Perfil
-            </button>
-          </div>
         </div>
+        {isUploading && <p className="text-blue-500">Atualizando foto...</p>}
       </div>
-
-      <ProfileModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        userProfile={decodedToken}
-      />
     </section>
   );
 }
